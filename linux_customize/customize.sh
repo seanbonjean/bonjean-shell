@@ -109,6 +109,9 @@ else
         CONFIG_DIR="$WORK_DIR/configs"
         mkdir -p "$CONFIG_DIR"
         echo "Local ./configs not found. Downloading from remote source ..."
+        echo
+        echo
+        echo
 
         # list of required config files
         FILES=(".bashrc" ".vimrc" "mysshd_config" "disable_pwdlogin")
@@ -121,6 +124,9 @@ else
                 fi
         done
 
+        echo
+        echo
+        echo
         echo "All config files downloaded to $CONFIG_DIR, and will be deleted after script execution."
 fi
 
