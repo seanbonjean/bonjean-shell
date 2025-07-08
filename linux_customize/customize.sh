@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # define config file source URL
-CLOUD_URL="https://bonjean-shell.oss-cn-hangzhou.aliyuncs.com/configs"
+CLOUD_URL="https://bonjean-shell.oss-cn-hangzhou.aliyuncs.com/linux_customize/configs"
 
 echo "This script customizes Bash, Vim and SSH configs for Linux..."
 
