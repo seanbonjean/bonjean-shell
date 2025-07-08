@@ -25,6 +25,17 @@ jobs:
                          -i ${{ secrets.OSS_ACCESS_KEY_ID }} \
                          -k ${{ secrets.OSS_ACCESS_KEY_SECRET }}
 
+      - name: Remove sensitive files before upload
+        run: |
+          rm -rf .git .github .gitattributes ossutil_output
+
       - name: Upload to OSS
         run: |
-          ossutil cp ./ oss://${{ secrets.OSS_BUCKET }}/ -rf
+          ossutil cp ./ oss://${{ secrets.OSS_BUCKET }}/ -rf \
+            --exclude ".git/*" \
+            --exclude ".git" \
+            --exclude ".github/*" \
+            --exclude ".github" \
+            --exclude ".gitattributes" \
+            --exclude "ossutil_output/*" \
+            --exclude "ossutil_output"
