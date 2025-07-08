@@ -1,0 +1,8 @@
+
+# BONJEAN CREATED RULE
+Port [port]
+PermitRootLogin no
+LoginGraceTime 30
+MaxAuthTries 3
+MaxSessions 1
+
