@@ -1,0 +1,30 @@
+name: Upload to Aliyun OSS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install OSSUtil
+        run: |
+          wget http://gosspublic.alicdn.com/ossutil/1.7.16/ossutil64
+          chmod +x ossutil64
+          mv ossutil64 /usr/local/bin/ossutil
+
+      - name: Configure OSSUtil
+        run: |
+          ossutil config -e ${{ secrets.OSS_ENDPOINT }} \
+                         -i ${{ secrets.OSS_ACCESS_KEY_ID }} \
+                         -k ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+
+      - name: Upload to OSS
+        run: |
+          ossutil cp ./ oss://${{ secrets.OSS_BUCKET }}/ -rf
