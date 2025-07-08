@@ -11,6 +11,18 @@ if [ "$EUID" -ne 0 ]; then
         exit 1
 fi
 
+echo
+echo "================================================================================="
+echo "Please make sure the system has openssh-server or a similar SSH server installed."
+echo "You can check with (Debian/Ubuntu): dpkg -l | grep openssh-server"
+echo "                   (CentOS/RHEL):   rpm -q openssh-server"
+echo
+echo "WARNING: If you want to install openssh-server later, it may overwrite"
+echo "configurations at /etc/ssh/sshd_config, which was customized in this script."
+echo "================================================================================="
+echo
+
+
 # ask the user whether to modify SSH configuration
 while true; do
         read -p "Do u want to modify SSH configuration? [Y/n]: " answer # read user input in the same line
