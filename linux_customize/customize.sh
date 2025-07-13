@@ -13,7 +13,8 @@ fi
 
 echo
 echo "================================================================================="
-echo "Please make sure the system has openssh-server or a similar SSH server installed."
+echo "NOTE: If you want to setup SSH configuration,"
+echo "please make sure the system has openssh-server or a similar SSH server installed."
 echo "You can check with (Debian/Ubuntu): dpkg -l | grep openssh-server"
 echo "                   (CentOS/RHEL):   rpm -q openssh-server"
 echo
@@ -22,6 +23,21 @@ echo "configurations at /etc/ssh/sshd_config, which was customized in this scrip
 echo "================================================================================="
 echo
 
+# ask the user to setup bash and vim for each user or single user
+while true; do
+        read -p "Customize Bash and Vim for all users (NO for single user)? [Y/n]: " answer # read user input in the same line
+        case "${answer,,}" in                                                               # change answer into lowercase
+        y)
+                ALL_USER=1
+                break
+                ;;
+        n)
+                ALL_USER=0
+                break
+                ;;
+        *) echo "Please enter y or n." ;;
+        esac
+done
 
 # ask the user whether to modify SSH configuration
 while true; do
@@ -82,8 +98,13 @@ fi
 # Confirm with the user
 echo "================== Summary =================="
 echo "The script will apply the following customizations:"
-echo "  - Customize Bash configuration (~/.bashrc) for each user"
-echo "  - Customize Vim configuration (~/.vimrc) for each user"
+if [ "$ALL_USER" -eq 1 ]; then
+        echo "  - Customize Bash configuration (~/.bashrc) for each user"
+        echo "  - Customize Vim configuration (~/.vimrc) for each user"
+else
+        echo "  - Customize Bash configuration (~/.bashrc) for me (single user)"
+        echo "  - Customize Vim configuration (~/.vimrc) for me (single user)"
+fi
 if [ "$NEED_SSH" -eq 1 ]; then
         echo "  - Customize SSH configuration:"
         echo "      -> Port: $SSH_PORT"
@@ -155,16 +176,33 @@ fi
 cd $WORK_DIR
 
 echo
+if [ "$ALL_USER" -eq 1 ]; then
+        cat mybashrc >>/root/.bashrc
+        cat myvimrc >>/root/.vimrc
+        echo "User: root config complete."
+        for USER_HOME in /home/*; do
+                USER_NAME=$(basename $USER_HOME)
+                cat mybashrc >>"$USER_HOME/.bashrc"
+                cat myvimrc >>"$USER_HOME/.vimrc"
+                echo "User: $USER_NAME config complete."
+        done
+else
+        if [ -n "$SUDO_USER" ]; then
+                USER_NAME="$SUDO_USER"
+                USER_HOME=$(eval echo "~$USER_NAME")
+        else
+                USER_NAME="root"
+                USER_HOME="/root"
+        fi
 
-cat mybashrc >>/root/.bashrc
-cat myvimrc >>/root/.vimrc
-echo "User: root config complete."
-for USER_HOME in /home/*; do
-        USER_NAME=$(basename $USER_HOME)
-        cat mybashrc >>"$USER_HOME/.bashrc"
-        cat myvimrc >>"$USER_HOME/.vimrc"
-        echo "User: $USER_NAME config complete."
-done
+        if [ -d "$USER_HOME" ]; then
+                cat mybashrc >>"$USER_HOME/.bashrc"
+                cat myvimrc >>"$USER_HOME/.vimrc"
+                echo "User: $USER_NAME config complete."
+        else
+                echo "User home directory for $USER_NAME not found!"
+        fi
+fi
 if [ "$NEED_SSH" -eq 1 ]; then
         cat mysshd_config >>/etc/ssh/sshd_config
         echo "SSH config complete."
